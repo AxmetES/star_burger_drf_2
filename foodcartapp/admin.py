@@ -7,6 +7,45 @@ from .models import Product
 from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem
+from .models import Order
+from .models import OrderDetails
+
+
+class OrderDetailInline(admin.TabularInline):
+    model = OrderDetails
+    exec = 0
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    search_fields = [
+        'first_name',
+        'last_name',
+    ]
+
+    list_display = [
+        'first_name',
+        'last_name',
+        'phone_number',
+        'deliver_address',
+    ]
+
+    inlines = [
+        OrderDetailInline
+    ]
+
+
+@admin.register(OrderDetails)
+class OrderDetailsAdmin(admin.ModelAdmin):
+    search_fields = [
+        'product',
+        'order',
+    ]
+
+    list_display = [
+        'product',
+        'quantity',
+    ]
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
