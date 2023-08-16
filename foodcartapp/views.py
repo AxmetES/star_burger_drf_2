@@ -1,9 +1,11 @@
 import json
+import re
 
 from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 
 from .models import Product, Order, OrderDetails
 
@@ -60,23 +62,43 @@ def product_list_api(request):
     })
 
 
-@api_view(['POST'])
-def register_order(request):
-    # TODO это лишь заглушка
-    order_data = request.data
-    order = Order(first_name=order_data.get('firstname'),
-                  last_name=order_data.get('lastname'),
-                  phone_number=order_data.get('phonenumber'),
-                  deliver_address=order_data.get('address')
-                  )
-    order.save()
-    for product in order_data.get('products'):
-        product_obj = Product.objects.get(id=product['product'])
-        order_details = OrderDetails(product=product_obj,
-                                     quantity=product['quantity'],
-                                     order=order)
-        order_details.save()
+def validate_phone_number(phone_number) -> bool:
+    pattern = re.compile(r"(\+\d{1,3})?\s?\(?\d{1,4}\)?[\s.-]?\d{3}[\s.-]?\d{4}")
+    match = re.search(pattern, phone_number)
+    if match:
+        pattern = r"^\d{5,15}$"
+        if re.match(pattern, phone_number):
+            return False
+        else:
+            return True
+    return True
 
+
+@api_view(['POST'])
+def register_order(request) -> json:
+    # TODO это лишь заглушка
+    try:
+        order_data = request.data
+        if validate_phone_number(order_data.get('phonenumber')):
+            raise Exception('Incorrect phone number.')
+
+        order = Order(first_name=order_data.get('firstname'),
+                      last_name=order_data.get('lastname'),
+                      phone_number=order_data.get('phonenumber'),
+                      deliver_address=order_data.get('address')
+                      )
+        order.save()
+        if len(order_data.get('products')) < 1:
+            raise Exception('list product is empty.')
+        for product in order_data.get('products'):
+            product_obj = Product.objects.get(id=product['product'])
+            order_details = OrderDetails(product=product_obj,
+                                         quantity=product['quantity'],
+                                         order=order)
+            order_details.save()
+    except Exception as e:
+        print(e)
+        return Response({'message': 'Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     response_data = {'message': 'Order saved successfully'}
-    return Response(response_data)
+    return Response(response_data, status=status.HTTP_200_OK)
 
