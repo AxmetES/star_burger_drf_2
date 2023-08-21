@@ -99,8 +99,7 @@ def register_order(request) -> json:
                                      quantity=product['quantity'],
                                      order=order)
         order_details.save()
-    response_data = {'message': 'Order saved successfully'}
-    return Response(response_data, status=status.HTTP_200_OK)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -123,8 +122,7 @@ def make_product(request) -> json:
                 products.append(product)
 
     Product.objects.bulk_create(products)
-    response_data = {'message': 'Products saved successfully'}
-    return Response(response_data, status=status.HTTP_201_CREATED)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
