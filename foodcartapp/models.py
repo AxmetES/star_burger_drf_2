@@ -95,20 +95,20 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    first_name = models.CharField(
+    firstname = models.CharField(
         'имя',
         blank=False,
         max_length=50,
         db_index=True
     )
-    last_name = models.CharField(
+    lastname = models.CharField(
         'фамилия',
         blank=True,
         max_length=100,
         db_index=True
     )
-    phone_number = PhoneNumberField(blank=False)
-    deliver_address = models.CharField(
+    phonenumber = PhoneNumberField(blank=False)
+    address = models.CharField(
         'адрес доставки',
         max_length=100,
         blank=False
@@ -119,14 +119,14 @@ class Order(models.Model):
         verbose_name_plural = 'заказы'
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.firstname} {self.lastname}'
 
 
 class OrderDetails(models.Model):
     product = models.ForeignKey(
         Product,
-        verbose_name='продукт',
-        related_name='product',
+        verbose_name='продукты',
+        related_name='products',
         null=True,
         blank=True,
         on_delete=models.SET_NULL
@@ -136,10 +136,8 @@ class OrderDetails(models.Model):
                                                MaxValueValidator(10)])
     order = models.ForeignKey(
         Order,
-        verbose_name='заказ',
-        related_name='order',
-        null=True,
-        blank=True,
+        verbose_name='детали заказа',
+        related_name='order_details',
         on_delete=models.CASCADE
     )
 

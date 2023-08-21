@@ -1,13 +1,18 @@
 import json
+import os
 import re
 
+from PIL import Image
 from django.http import JsonResponse
 from django.templatetags.static import static
+from django.core.files import File
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from .models import Product, Order, OrderDetails, ProductCategory, Restaurant
+from .serializers import OrderSerializer, ProductSerializer, RestaurantSerializer
 
-from .models import Product, Order, OrderDetails
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def banners_list_api(request):
@@ -77,28 +82,63 @@ def validate_phone_number(phone_number) -> bool:
 @api_view(['POST'])
 def register_order(request) -> json:
     # TODO это лишь заглушка
-    try:
-        order_data = request.data
-        if validate_phone_number(order_data.get('phonenumber')):
-            raise Exception('Incorrect phone number.')
-
-        order = Order(first_name=order_data.get('firstname'),
-                      last_name=order_data.get('lastname'),
-                      phone_number=order_data.get('phonenumber'),
-                      deliver_address=order_data.get('address')
-                      )
-        order.save()
-        if len(order_data.get('products')) < 1:
-            raise Exception('list product is empty.')
-        for product in order_data.get('products'):
-            product_obj = Product.objects.get(id=product['product'])
-            order_details = OrderDetails(product=product_obj,
-                                         quantity=product['quantity'],
-                                         order=order)
-            order_details.save()
-    except Exception as e:
-        print(e)
-        return Response({'message': 'Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    serializer = OrderSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    order, is_created = Order.objects.get_or_create(
+        firstname=serializer.validated_data['firstname'],
+        lastname=serializer.validated_data['lastname'],
+        phonenumber=serializer.validated_data['phonenumber'],
+        address=serializer.validated_data['address'])
+    # order.save()
+    print(is_created)
+    products = serializer.validated_data['products']
+    order_details = []
+    for product in products:
+        product_obj = Product.objects.get(id=product['product'].id)
+        order_details = OrderDetails(product=product_obj,
+                                     quantity=product['quantity'],
+                                     order=order)
+        order_details.save()
     response_data = {'message': 'Order saved successfully'}
     return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def make_product(request) -> json:
+    products = []
+    for product_data in request.data:
+        serializer = ProductSerializer(data=product_data)
+        serializer.is_valid(raise_exception=True)
+        image_name = serializer.validated_data.pop('image')
+        category = serializer.validated_data.pop('category')
+        category_obj = ProductCategory.objects.get(name=category)
+
+        media_dir = os.path.join(BASE_DIR, "media")
+        if image_name:
+            img_file_path = os.path.join(media_dir, image_name)
+            with open(img_file_path, 'rb') as img_file:
+                product = Product(**serializer.validated_data)
+                product.image.save(image_name, img_file, save=False)
+                product.category = category_obj
+                products.append(product)
+
+    Product.objects.bulk_create(products)
+    response_data = {'message': 'Products saved successfully'}
+    return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def add_restaurants(request) -> json:
+    restaurants = []
+    for restaurant in request.data:
+        serializer = RestaurantSerializer(data=restaurant)
+        serializer.is_valid(raise_exception=True)
+        restaurant = Restaurant(**serializer.validated_data)
+        restaurants.append(restaurant)
+    Restaurant.objects.bulk_create(restaurants)
+    response_data = {'message': 'Restaurants saved successfully'}
+    return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+
 
