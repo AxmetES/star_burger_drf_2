@@ -142,3 +142,6 @@ dmypy.json
 cython_debug/
 
 .parcel-cache/
+
+# Pycharm idea
+.idea

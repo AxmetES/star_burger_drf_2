@@ -103,7 +103,7 @@ def register_order(request) -> json:
 
 
 @api_view(['POST'])
-def make_product(request) -> json:
+def add_products(request) -> json:
     products = []
     for product_data in request.data:
         serializer = ProductSerializer(data=product_data)
