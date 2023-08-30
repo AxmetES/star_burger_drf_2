@@ -81,6 +81,7 @@ def validate_phone_number(phone_number) -> bool:
 
 @api_view(['POST'])
 def register_order(request) -> json:
+    order_details = []
     # TODO это лишь заглушка
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -89,16 +90,15 @@ def register_order(request) -> json:
         lastname=serializer.validated_data['lastname'],
         phonenumber=serializer.validated_data['phonenumber'],
         address=serializer.validated_data['address'])
-    # order.save()
-    print(is_created)
     products = serializer.validated_data['products']
-    order_details = []
     for product in products:
         product_obj = Product.objects.get(id=product['product'].id)
-        order_details = OrderDetails(product=product_obj,
+        order_detail = OrderDetails(product=product_obj,
                                      quantity=product['quantity'],
-                                     order=order)
-        order_details.save()
+                                     order=order,
+                                    price=product_obj.price * product['quantity'])
+        order_details.append(order_detail)
+    OrderDetails.objects.bulk_create(order_details)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
