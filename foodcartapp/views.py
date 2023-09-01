@@ -2,15 +2,17 @@ import json
 import os
 import re
 
-from PIL import Image
 from django.http import JsonResponse
 from django.templatetags.static import static
 from django.db import transaction
+from django.urls import reverse
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Product, Order, OrderDetails, ProductCategory, Restaurant
 from .serializers import OrderSerializer, ProductSerializer, RestaurantSerializer
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -78,11 +80,11 @@ def validate_phone_number(phone_number) -> bool:
             return True
     return True
 
+
 @transaction.atomic()
 @api_view(['POST'])
 def register_order(request) -> json:
     order_details = []
-    # TODO это лишь заглушка
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     order, is_created = Order.objects.get_or_create(
@@ -120,7 +122,6 @@ def add_products(request) -> json:
                 product.image.save(image_name, img_file, save=False)
                 product.category = category_obj
                 products.append(product)
-
     Product.objects.bulk_create(products)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
