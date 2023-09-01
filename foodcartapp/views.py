@@ -5,7 +5,7 @@ import re
 from PIL import Image
 from django.http import JsonResponse
 from django.templatetags.static import static
-from django.core.files import File
+from django.db import transaction
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -78,7 +78,7 @@ def validate_phone_number(phone_number) -> bool:
             return True
     return True
 
-
+@transaction.atomic()
 @api_view(['POST'])
 def register_order(request) -> json:
     order_details = []
@@ -94,8 +94,8 @@ def register_order(request) -> json:
     for product in products:
         product_obj = Product.objects.get(id=product['product'].id)
         order_detail = OrderDetails(product=product_obj,
-                                     quantity=product['quantity'],
-                                     order=order,
+                                    quantity=product['quantity'],
+                                    order=order,
                                     price=product_obj.price * product['quantity'])
         order_details.append(order_detail)
     OrderDetails.objects.bulk_create(order_details)
