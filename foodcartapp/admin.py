@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.shortcuts import reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
+from django.shortcuts import redirect
 
 from .models import Product
 from .models import ProductCategory
@@ -33,6 +34,17 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderDetailInline
     ]
+
+    def response_change(self, request, obj):
+        if "_save" in request.POST:
+            next_url = request.GET.get('next', None)
+
+            if next_url:
+                return redirect(next_url)
+            else:
+                return super().response_change(request, obj)
+
+        return super().response_change(request, obj)
 
 
 @admin.register(OrderDetails)
