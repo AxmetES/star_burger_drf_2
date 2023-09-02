@@ -136,6 +136,7 @@ class Order(models.Model):
         max_length=14,
         choices=ORDER_STATUS,
         default=CONFIRMATION,
+        db_index=True
     )
 
     class Meta:
