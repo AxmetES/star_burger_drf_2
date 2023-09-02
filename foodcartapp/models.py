@@ -139,6 +139,12 @@ class Order(models.Model):
         db_index=True
     )
 
+    comments = models.TextField(
+        'комментарии',
+        max_length=300,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
