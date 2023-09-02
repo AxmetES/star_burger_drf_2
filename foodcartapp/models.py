@@ -122,6 +122,22 @@ class Order(models.Model):
 
     objects = OrderQuerySet.as_manager()
 
+    CONFIRMATION = 'Необработанный'
+    PROCESSING = 'Приготовление'
+    DELIVERY = 'Доставка'
+    COMPLETED = 'Завершено'
+    ORDER_STATUS = [
+        (CONFIRMATION, 'Необработанный'),
+        (PROCESSING, 'Приготовление'),
+        (DELIVERY, 'Доставка'),
+        (COMPLETED, 'Завершено'),
+    ]
+    order_status = models.CharField(
+        max_length=14,
+        choices=ORDER_STATUS,
+        default=CONFIRMATION,
+    )
+
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
