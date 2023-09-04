@@ -140,8 +140,24 @@ class Order(models.Model):
         db_index=True
     )
 
+    CASH = 'Наличными'
+    CASHLESS = 'Безналичный'
+    CASHLESS_ON_THE_SPOT = 'Безналичный на месте'
+    PAYMENT_METHOD = [
+        (CASH, 'Наличными'),
+        (CASHLESS, 'Безналичный'),
+        (CASHLESS_ON_THE_SPOT, 'Безналичный на месте'),
+    ]
+    payment_method = models.CharField(
+        'Способ оплаты',
+        max_length=20,
+        choices=PAYMENT_METHOD,
+        default=CASH,
+        db_index=True
+    )
+
     comments = models.TextField(
-        'комментарии',
+        'Комментарии',
         max_length=300,
         blank=True,
     )
