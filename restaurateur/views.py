@@ -92,6 +92,32 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
+    # restaurant_menu_items = RestaurantMenuItem.objects.all()
+    orders_details = []
+    orders_menu_items = Order.objects.total_price().prefetch_related('order_details__product__menu_items').all()
+    for order in orders_menu_items:
+        order_detail = {'id': order.id,
+                        'status': order.order_status,
+                        'payment_method': order.payment_method,
+                        'total_price': order.total_price,
+                        'client': f'{order.firstname} {order.lastname}',
+                        'phonenumber': order.phonenumber,
+                        'address': order.address,
+                        'comments': order.comments,
+                        'restaurants': set()}
+        if order.restaurant:
+            order_detail['restaurants'].add(f'Готовит {order.restaurant.name}')
+            orders_details.append(order_detail)
+            continue
+        products = order.order_details.all()
+        for product in products:
+            products = product.product
+            menu_items = products.menu_items.all()
+            for menu in menu_items:
+                restaurant = menu.restaurant
+                order_detail['restaurants'].add(restaurant.name)
+        orders_details.append(order_detail)
+
     return render(request, template_name='order_items.html', context={
-        'order_items': Order.objects.total_price(),
+        'order_items': orders_details,
     })

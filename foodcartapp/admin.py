@@ -19,6 +19,11 @@ class OrderDetailInline(admin.TabularInline):
     exec = 0
 
 
+class RestaurantMenuItemInline(admin.TabularInline):
+    model = RestaurantMenuItem
+    extra = 0
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     search_fields = [
@@ -31,14 +36,25 @@ class OrderAdmin(admin.ModelAdmin):
         'lastname',
         'phonenumber',
         'address',
+        'order_status',
+        'payment_method',
+        'comments',
+        'restaurant',
+        'created_at',
+        'called_at',
+        'delivered_at'
     ]
 
     inlines = [
-        OrderDetailInline
+        OrderDetailInline,
     ]
+
+    list_filter = ('restaurant',)
 
     def response_change(self, request, obj):
         if "_save" in request.POST:
+            selected_restaurant_id = request.GET.get('restaurant')
+
             next_url = request.GET.get('next', None)
             if url_has_allowed_host_and_scheme(next_url, allowed_hosts=settings.ALLOWED_HOSTS):
                 return redirect(next_url)
@@ -59,11 +75,6 @@ class OrderDetailsAdmin(admin.ModelAdmin):
         'product',
         'quantity',
     ]
-
-
-class RestaurantMenuItemInline(admin.TabularInline):
-    model = RestaurantMenuItem
-    extra = 0
 
 
 @admin.register(Restaurant)

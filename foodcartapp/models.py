@@ -5,30 +5,6 @@ from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class Restaurant(models.Model):
-    name = models.CharField(
-        'название',
-        max_length=50
-    )
-    address = models.CharField(
-        'адрес',
-        max_length=100,
-        blank=True,
-    )
-    contact_phone = models.CharField(
-        'контактный телефон',
-        max_length=50,
-        blank=True,
-    )
-
-    class Meta:
-        verbose_name = 'ресторан'
-        verbose_name_plural = 'рестораны'
-
-    def __str__(self):
-        return self.name
-
-
 class ProductQuerySet(models.QuerySet):
     def available(self):
         products = (
@@ -96,6 +72,60 @@ class Product(models.Model):
         return self.name
 
 
+class Restaurant(models.Model):
+    name = models.CharField(
+        'название',
+        max_length=50
+    )
+    address = models.CharField(
+        'адрес',
+        max_length=100,
+        blank=True,
+    )
+    contact_phone = models.CharField(
+        'контактный телефон',
+        max_length=50,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = 'ресторан'
+        verbose_name_plural = 'рестораны'
+
+    def __str__(self):
+        return self.name
+
+
+class RestaurantMenuItem(models.Model):
+    restaurant = models.ForeignKey(
+        Restaurant,
+        related_name='menu_items',
+        verbose_name="ресторан",
+        on_delete=models.CASCADE,
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='menu_items',
+        verbose_name='продукт',
+    )
+    availability = models.BooleanField(
+        'в продаже',
+        default=True,
+        db_index=True
+    )
+
+    class Meta:
+        verbose_name = 'пункт меню ресторана'
+        verbose_name_plural = 'пункты меню ресторана'
+        unique_together = [
+            ['restaurant', 'product']
+        ]
+
+    def __str__(self):
+        return f"{self.restaurant.name} - {self.product.name}"
+
+
 class OrderQuerySet(models.QuerySet):
     def total_price(self):
         return self.annotate(total_price=Sum(F('order_details__price')))
@@ -134,6 +164,7 @@ class Order(models.Model):
         (COMPLETED, 'Завершено'),
     ]
     order_status = models.CharField(
+        'Статус заказа',
         max_length=14,
         choices=ORDER_STATUS,
         default=CONFIRMATION,
@@ -161,6 +192,16 @@ class Order(models.Model):
         max_length=300,
         blank=True,
     )
+
+    restaurant = models.ForeignKey(
+        Restaurant,
+        related_name='orders',
+        verbose_name="рестораны",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL
+    )
+
     created_at = models.DateTimeField('Дата создания заказа',
                                       default=timezone.now,
                                       db_index=True)
@@ -212,33 +253,3 @@ class OrderDetails(models.Model):
 
     def __str__(self):
         return f'{self.product.name} {self.order.__str__()}'
-
-
-class RestaurantMenuItem(models.Model):
-    restaurant = models.ForeignKey(
-        Restaurant,
-        related_name='menu_items',
-        verbose_name="ресторан",
-        on_delete=models.CASCADE,
-    )
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name='menu_items',
-        verbose_name='продукт',
-    )
-    availability = models.BooleanField(
-        'в продаже',
-        default=True,
-        db_index=True
-    )
-
-    class Meta:
-        verbose_name = 'пункт меню ресторана'
-        verbose_name_plural = 'пункты меню ресторана'
-        unique_together = [
-            ['restaurant', 'product']
-        ]
-
-    def __str__(self):
-        return f"{self.restaurant.name} - {self.product.name}"
