@@ -1,3 +1,4 @@
+from geopy import distance
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
@@ -92,7 +93,6 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    # restaurant_menu_items = RestaurantMenuItem.objects.all()
     orders_details = []
     orders_menu_items = Order.objects.total_price().prefetch_related('order_details__product__menu_items').all()
     for order in orders_menu_items:
@@ -106,7 +106,9 @@ def view_orders(request):
                         'comments': order.comments,
                         'restaurants': set()}
         if order.restaurant:
-            order_detail['restaurants'].add(f'Готовит {order.restaurant.name}')
+            range_to_order = distance.distance((order.lat, order.lon), (order.restaurant.lat,
+                                                                        order.restaurant.lon)).km
+            order_detail['restaurants'].add(f'Готовит {order.restaurant.name} - {round(range_to_order, 3)} km')
             orders_details.append(order_detail)
             continue
         products = order.order_details.all()
@@ -115,7 +117,8 @@ def view_orders(request):
             menu_items = products.menu_items.all()
             for menu in menu_items:
                 restaurant = menu.restaurant
-                order_detail['restaurants'].add(restaurant.name)
+                range_to_order = distance.distance((order.lat, order.lon), (restaurant.lat, restaurant.lon)).km
+                order_detail['restaurants'].add(f'{restaurant.name} - {round(range_to_order, 3)} km')
         orders_details.append(order_detail)
 
     return render(request, template_name='order_items.html', context={

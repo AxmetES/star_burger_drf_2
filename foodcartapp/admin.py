@@ -6,6 +6,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import redirect
 
 from star_burger import settings
+from star_burger.settings import YANDEX_API_KEY
+from star_burger.utils import fetch_coordinates
 from .models import Product
 from .models import ProductCategory
 from .models import Restaurant
@@ -53,14 +55,16 @@ class OrderAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         if "_save" in request.POST:
-            selected_restaurant_id = request.GET.get('restaurant')
-
+            if obj.address:
+                lon, lat = fetch_coordinates(YANDEX_API_KEY, obj.address)
+                obj.lon = lon
+                obj.lat = lat
+                obj.save()
             next_url = request.GET.get('next', None)
             if url_has_allowed_host_and_scheme(next_url, allowed_hosts=settings.ALLOWED_HOSTS):
                 return redirect(next_url)
             else:
                 return super().response_change(request, obj)
-
         return super().response_change(request, obj)
 
 

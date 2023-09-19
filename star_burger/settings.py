@@ -125,3 +125,5 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "bundles"),
 ]
+
+YANDEX_API_KEY = env('YANDEX_API_KEY')

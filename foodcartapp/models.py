@@ -88,6 +88,18 @@ class Restaurant(models.Model):
         blank=True,
     )
 
+    lon = models.FloatField(
+        'долгота',
+        blank=True,
+        null=True,
+    )
+
+    lat = models.FloatField(
+        'ширата',
+        blank=True,
+        null=True,
+    )
+
     class Meta:
         verbose_name = 'ресторан'
         verbose_name_plural = 'рестораны'
@@ -200,6 +212,18 @@ class Order(models.Model):
         blank=True,
         null=True,
         on_delete=models.SET_NULL
+    )
+
+    lon = models.FloatField(
+        'долгота',
+        blank=True,
+        null=True,
+    )
+
+    lat = models.FloatField(
+        'ширата',
+        blank=True,
+        null=True,
     )
 
     created_at = models.DateTimeField('Дата создания заказа',

@@ -9,8 +9,11 @@ from django.db import transaction
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+
+from star_burger.utils import fetch_coordinates
 from .models import Product, Order, OrderDetails, ProductCategory, Restaurant
 from .serializers import OrderSerializer, ProductSerializer, RestaurantSerializer
+from star_burger.settings import YANDEX_API_KEY
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -86,11 +89,14 @@ def register_order(request) -> json:
     order_details = []
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
+    lon, lat = fetch_coordinates(YANDEX_API_KEY, serializer.validated_data['address'])
     order, is_created = Order.objects.get_or_create(
         firstname=serializer.validated_data['firstname'],
         lastname=serializer.validated_data['lastname'],
         phonenumber=serializer.validated_data['phonenumber'],
-        address=serializer.validated_data['address'])
+        address=serializer.validated_data['address'],
+        lon=lon,
+        lat=lat)
     products = serializer.validated_data['products']
     for product in products:
         product_obj = Product.objects.get(id=product['product'].id)
@@ -129,6 +135,7 @@ def add_products(request) -> json:
 def add_restaurants(request) -> json:
     restaurants = []
     for restaurant in request.data:
+        restaurant['lon'], restaurant['lat'] = fetch_coordinates(YANDEX_API_KEY, restaurant['address'])
         serializer = RestaurantSerializer(data=restaurant)
         serializer.is_valid(raise_exception=True)
         restaurant = Restaurant(**serializer.validated_data)

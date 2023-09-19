@@ -1,8 +1,6 @@
 from django.core.validators import MinValueValidator
-from django.db.models import TextField
 from rest_framework import serializers
-from rest_framework.fields import CharField, DecimalField, ImageField, BooleanField
-from rest_framework.serializers import ModelSerializer, Serializer
+from rest_framework.serializers import ModelSerializer
 
 from foodcartapp.models import Order, OrderDetails, ProductCategory, Product, Restaurant
 
