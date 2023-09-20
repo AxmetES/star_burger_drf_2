@@ -120,7 +120,6 @@ def add_products(request) -> json:
         image_name = serializer.validated_data.pop('image')
         category = serializer.validated_data.pop('category')
         category_obj = ProductCategory.objects.get(name=category)
-
         media_dir = os.path.join(BASE_DIR, "media")
         if image_name:
             img_file_path = os.path.join(media_dir, image_name)
@@ -130,7 +129,8 @@ def add_products(request) -> json:
                 product.category = category_obj
                 products.append(product)
     Product.objects.bulk_create(products)
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    response_data = {'message': 'Products saved successfully'}
+    return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
