@@ -2,7 +2,7 @@ from django.core.validators import MinValueValidator
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from foodcartapp.models import Order, OrderDetails, ProductCategory, Product, Restaurant
+from foodcartapp.models import Order, OrderDetails, ProductCategory, Product, Restaurant, GeoPosition
 
 
 class OrderDetailsSerializer(ModelSerializer):

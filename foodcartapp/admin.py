@@ -7,13 +7,14 @@ from django.shortcuts import redirect
 
 from star_burger import settings
 from star_burger.settings import YANDEX_API_KEY
-from star_burger.utils import fetch_coordinates
+from star_burger.utils import fetch_coordinates, get_or_create_lon_lat
 from .models import Product
 from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import Order
 from .models import OrderDetails
+from .models import GeoPosition
 
 
 class OrderDetailInline(admin.TabularInline):
@@ -56,7 +57,7 @@ class OrderAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         if "_save" in request.POST:
             if obj.address:
-                lon, lat = fetch_coordinates(YANDEX_API_KEY, obj.address)
+                lon, lat = get_or_create_lon_lat(obj.address)
                 obj.lon = lon
                 obj.lat = lat
                 obj.save()
@@ -171,3 +172,15 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(ProductCategory)
 class ProductAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(GeoPosition)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = [
+        'lon',
+        'lat',
+        'address',
+        'created_at',
+        'updated_at'
+    ]
+

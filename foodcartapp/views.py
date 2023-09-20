@@ -1,17 +1,19 @@
 import json
 import os
 import re
+from datetime import datetime, timedelta
 
 from django.http import JsonResponse
 from django.templatetags.static import static
 from django.db import transaction
+from django.utils import timezone
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from star_burger.utils import fetch_coordinates
-from .models import Product, Order, OrderDetails, ProductCategory, Restaurant
+from star_burger.utils import fetch_coordinates, get_or_create_lon_lat
+from .models import Product, Order, OrderDetails, ProductCategory, Restaurant, GeoPosition
 from .serializers import OrderSerializer, ProductSerializer, RestaurantSerializer
 from star_burger.settings import YANDEX_API_KEY
 
@@ -89,7 +91,7 @@ def register_order(request) -> json:
     order_details = []
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    lon, lat = fetch_coordinates(YANDEX_API_KEY, serializer.validated_data['address'])
+    lon, lat = get_or_create_lon_lat(serializer.validated_data['address'])
     order, is_created = Order.objects.get_or_create(
         firstname=serializer.validated_data['firstname'],
         lastname=serializer.validated_data['lastname'],
@@ -135,10 +137,12 @@ def add_products(request) -> json:
 def add_restaurants(request) -> json:
     restaurants = []
     for restaurant in request.data:
-        restaurant['lon'], restaurant['lat'] = fetch_coordinates(YANDEX_API_KEY, restaurant['address'])
         serializer = RestaurantSerializer(data=restaurant)
         serializer.is_valid(raise_exception=True)
         restaurant = Restaurant(**serializer.validated_data)
+        lon, lat = get_or_create_lon_lat(restaurant.address)
+        restaurant.lon = lon
+        restaurant.lat = lat
         restaurants.append(restaurant)
     Restaurant.objects.bulk_create(restaurants)
     response_data = {'message': 'Restaurants saved successfully'}

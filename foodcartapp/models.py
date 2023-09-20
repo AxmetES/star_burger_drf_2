@@ -276,4 +276,35 @@ class OrderDetails(models.Model):
         verbose_name_plural = 'детали заказов'
 
     def __str__(self):
-        return f'{self.product.name} {self.order.__str__()}'
+        return f'{self.order.__str__()}'
+
+
+class GeoPosition(models.Model):
+    lon = models.FloatField(
+        'долгота'
+    )
+
+    lat = models.FloatField(
+        'ширата'
+    )
+
+    address = models.CharField(
+        'адрес',
+        max_length=50,
+        db_index=True
+    )
+
+    created_at = models.DateTimeField('Дата создания заказа',
+                                      auto_now=True,
+                                      db_index=True)
+
+    updated_at = models.DateTimeField('Дата обнавления заказа',
+                                      auto_now=True,
+                                      db_index=True)
+
+    class Meta:
+        verbose_name = 'геопозиция'
+        verbose_name_plural = 'геопозиции'
+
+    def __str__(self):
+        return f'{self.address}'
