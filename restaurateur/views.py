@@ -1,3 +1,5 @@
+import json
+
 from geopy import distance
 from django import forms
 from django.shortcuts import redirect, render
@@ -7,9 +9,10 @@ from django.contrib.auth.decorators import user_passes_test
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-
+from rest_framework.renderers import JSONRenderer
 
 from foodcartapp.models import Product, Restaurant, Order
+from foodcartapp.serializers import OrderSerializer
 
 
 class Login(forms.Form):

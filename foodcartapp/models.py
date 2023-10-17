@@ -159,8 +159,7 @@ class Order(models.Model):
     phonenumber = PhoneNumberField(blank=False)
     address = models.CharField(
         'адрес доставки',
-        max_length=100,
-        blank=False
+        max_length=100
     )
 
     objects = OrderQuerySet.as_manager()
@@ -195,7 +194,7 @@ class Order(models.Model):
         'Способ оплаты',
         max_length=20,
         choices=PAYMENT_METHOD,
-        default=CASH,
+        default="не заполнено",
         db_index=True
     )
 
@@ -221,7 +220,7 @@ class Order(models.Model):
     )
 
     lat = models.FloatField(
-        'ширата',
+        'широта',
         blank=True,
         null=True,
     )
@@ -307,4 +306,4 @@ class GeoPosition(models.Model):
         verbose_name_plural = 'геопозиции'
 
     def __str__(self):
-        return f'{self.address}'
+        return self.address

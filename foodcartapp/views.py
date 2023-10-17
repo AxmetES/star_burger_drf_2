@@ -91,14 +91,7 @@ def register_order(request) -> json:
     order_details = []
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    lon, lat = get_or_create_lon_lat(serializer.validated_data['address'])
-    order, is_created = Order.objects.get_or_create(
-        firstname=serializer.validated_data['firstname'],
-        lastname=serializer.validated_data['lastname'],
-        phonenumber=serializer.validated_data['phonenumber'],
-        address=serializer.validated_data['address'],
-        lon=lon,
-        lat=lat)
+    order = serializer.create(serializer.validated_data)
     products = serializer.validated_data['products']
     for product in products:
         product_obj = Product.objects.get(id=product['product'].id)
@@ -117,7 +110,7 @@ def add_products(request) -> json:
     for product_data in request.data:
         serializer = ProductSerializer(data=product_data)
         serializer.is_valid(raise_exception=True)
-        image_name = serializer.validated_data.pop('image')
+        image_name = product_data.pop('image')
         category = serializer.validated_data.pop('category')
         category_obj = ProductCategory.objects.get(name=category)
         media_dir = os.path.join(BASE_DIR, "media")
