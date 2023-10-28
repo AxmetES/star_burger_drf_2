@@ -275,7 +275,7 @@ class OrderDetails(models.Model):
         verbose_name_plural = 'детали заказов'
 
     def __str__(self):
-        return f'{self.order.__str__()}'
+        return self.order.__str__()
 
 
 class GeoPosition(models.Model):

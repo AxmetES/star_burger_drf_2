@@ -99,15 +99,16 @@ def view_orders(request):
     orders_details = []
     orders_menu_items = Order.objects.total_price().prefetch_related('order_details__product__menu_items').all()
     for order in orders_menu_items:
-        order_detail = {'id': order.id,
-                        'status': order.order_status,
-                        'payment_method': order.payment_method,
-                        'total_price': order.total_price,
-                        'client': f'{order.firstname} {order.lastname}',
-                        'phonenumber': order.phonenumber,
-                        'address': order.address,
-                        'comments': order.comments,
-                        'restaurants': set()}
+        order_detail = {
+            'id': order.id,
+            'status': order.order_status,
+            'payment_method': order.payment_method,
+            'total_price': order.total_price,
+            'client': f'{order.firstname} {order.lastname}',
+            'phonenumber': order.phonenumber,
+            'address': order.address,
+            'comments': order.comments,
+            'restaurants': set()}
         if order.restaurant:
             range_to_order = distance.distance((order.lat, order.lon), (order.restaurant.lat,
                                                                         order.restaurant.lon)).km

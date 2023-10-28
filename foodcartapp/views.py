@@ -1,7 +1,6 @@
 import json
 import os
 import re
-from datetime import datetime, timedelta
 
 from django.http import JsonResponse
 from django.templatetags.static import static
@@ -12,10 +11,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from star_burger.utils import fetch_coordinates, get_or_create_lon_lat
-from .models import Product, Order, OrderDetails, ProductCategory, Restaurant, GeoPosition
+from .models import Product
 from .serializers import OrderSerializer, ProductSerializer, RestaurantSerializer
-from star_burger.settings import YANDEX_API_KEY
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -88,56 +85,28 @@ def validate_phone_number(phone_number) -> bool:
 @transaction.atomic()
 @api_view(['POST'])
 def register_order(request) -> json:
-    order_details = []
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    order = serializer.create(serializer.validated_data)
-    products = serializer.validated_data['products']
-    for product in products:
-        product_obj = Product.objects.get(id=product['product'].id)
-        order_detail = OrderDetails(product=product_obj,
-                                    quantity=product['quantity'],
-                                    order=order,
-                                    price=product_obj.price * product['quantity'])
-        order_details.append(order_detail)
-    OrderDetails.objects.bulk_create(order_details)
+    serializer.create(serializer.validated_data)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def add_products(request) -> json:
-    products = []
     for product_data in request.data:
         serializer = ProductSerializer(data=product_data)
         serializer.is_valid(raise_exception=True)
-        image_name = product_data.pop('image')
-        category = serializer.validated_data.pop('category')
-        category_obj = ProductCategory.objects.get(name=category)
-        media_dir = os.path.join(BASE_DIR, "media")
-        if image_name:
-            img_file_path = os.path.join(media_dir, image_name)
-            with open(img_file_path, 'rb') as img_file:
-                product = Product(**serializer.validated_data)
-                product.image.save(image_name, img_file, save=False)
-                product.category = category_obj
-                products.append(product)
-    Product.objects.bulk_create(products)
+        serializer.create(serializer.validated_data, product_data['image'])
     response_data = {'message': 'Products saved successfully'}
     return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
 def add_restaurants(request) -> json:
-    restaurants = []
     for restaurant in request.data:
         serializer = RestaurantSerializer(data=restaurant)
         serializer.is_valid(raise_exception=True)
-        restaurant = Restaurant(**serializer.validated_data)
-        lon, lat = get_or_create_lon_lat(restaurant.address)
-        restaurant.lon = lon
-        restaurant.lat = lat
-        restaurants.append(restaurant)
-    Restaurant.objects.bulk_create(restaurants)
+        serializer.create(serializer.validated_data)
     response_data = {'message': 'Restaurants saved successfully'}
     return Response(response_data, status=status.HTTP_201_CREATED)
 
