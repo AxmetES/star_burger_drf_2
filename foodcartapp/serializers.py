@@ -56,17 +56,12 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    description = serializers.CharField()
+    description = serializers.CharField(max_length=200)
     category = serializers.PrimaryKeyRelatedField(queryset=ProductCategory.objects.all())
 
     class Meta:
         model = Product
         fields = ['name', 'category', 'price', 'description']
-
-    def validate_description(self, value):
-        if len(value) > 200:
-            raise serializers.ValidationError('Длина поля "description" не должна превышать 200 символов.')
-        return value
 
     def create(self, validated_data, image_name):
         category = validated_data['category']
