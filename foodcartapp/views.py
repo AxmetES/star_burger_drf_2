@@ -5,7 +5,6 @@ import re
 from django.http import JsonResponse
 from django.templatetags.static import static
 from django.db import transaction
-from django.utils import timezone
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -44,7 +43,6 @@ def banners_list_api(request):
 
 def product_list_api(request):
     products = Product.objects.select_related('category').available()
-
     dumped_products = []
     for product in products:
         dumped_product = {

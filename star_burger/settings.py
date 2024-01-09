@@ -11,7 +11,8 @@ env.read_env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-
+ROLLBAR_ACCESS_TOKEN = env('ROLLBAR_ACCESS_TOKEN')
+ENVIRONMENT = env.bool('ENVIRONMENT')
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', False)
 
@@ -40,6 +41,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404'
 ]
 
 ROOT_URLCONF = 'star_burger.urls'
@@ -127,3 +129,11 @@ STATICFILES_DIRS = [
 ]
 
 YANDEX_API_KEY = env('YANDEX_API_KEY')
+
+
+ROLLBAR = {
+    'access_token': ROLLBAR_ACCESS_TOKEN,
+    'environment': 'development' if ENVIRONMENT else 'production',
+    'code_version': '1.0',
+    'root': BASE_DIR,
+}
