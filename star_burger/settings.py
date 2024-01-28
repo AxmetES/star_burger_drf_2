@@ -9,14 +9,15 @@ env = Env()
 env.read_env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 
 ROLLBAR_ACCESS_TOKEN = env('ROLLBAR_ACCESS_TOKEN')
 ENVIRONMENT = env.bool('ENVIRONMENT')
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
@@ -126,6 +127,7 @@ INTERNAL_IPS = [
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "bundles"),
+    os.path.join(BASE_DIR, "bundles-src"),
 ]
 
 YANDEX_API_KEY = env('YANDEX_API_KEY')
