@@ -138,18 +138,17 @@ Parcel будет следить за файлами в каталоге `bundle
 
 
 ## Как запустить prod-версию сайта
-
-Собрать фронтенд:
-
-```sh
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
-```
-
 Настроить бэкенд: создать файл `.env` в каталоге `star_burger/` со следующими настройками:
 
 - `DEBUG` — дебаг-режим. Поставьте `False`.
 - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
+
+Запустить файл ```deploy_star_burger.sh```,
+```sh
+./deploy_star_burger.sh
+```
+дождаться сообщения ```deploy script done.``` deploy готов.
 
 ## Цели проекта
 
