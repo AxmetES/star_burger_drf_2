@@ -1,4 +1,6 @@
 
+static_folder=/home/non-root/opt/star_burger_drf_2/static
+
 ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 
 source venv/bin/activate
@@ -19,7 +21,6 @@ sudo systemctl restart star_burger.service
 
 
 source /home/non-root/opt/star_burger_drf_2/.env
-echo $ROLLBAR_ACCESS_TOKEN
 
 commit_hash=$(git rev-parse --short HEAD)
 echo $commit_hash
