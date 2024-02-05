@@ -15,7 +15,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 ROLLBAR_ACCESS_TOKEN = env('ROLLBAR_ACCESS_TOKEN', default="")
 ENVIRONMENT = env.bool('ENVIRONMENT', default=False)
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', False):wq
+DEBUG = env.bool('DEBUG', False)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', 'localhost')
 
