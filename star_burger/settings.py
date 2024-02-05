@@ -12,12 +12,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
-ROLLBAR_ACCESS_TOKEN = env('ROLLBAR_ACCESS_TOKEN')
-ENVIRONMENT = env.bool('ENVIRONMENT')
+ROLLBAR_ACCESS_TOKEN = env('ROLLBAR_ACCESS_TOKEN', default="")
+ENVIRONMENT = env.bool('ENVIRONMENT', default=False)
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', False)
+DEBUG = env.bool('DEBUG', False):wq
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', 'localhost')
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',

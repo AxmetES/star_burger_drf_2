@@ -150,6 +150,11 @@ Parcel будет следить за файлами в каталоге `bundle
 ```
 дождаться сообщения ```deploy script done.``` deploy готов.
 
+## Демонстрационная версию сайта.
+```https://pydev.su/```
+
+[Демонстрационный сайт.](https://pydev.su/)
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
