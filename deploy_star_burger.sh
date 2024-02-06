@@ -1,3 +1,6 @@
+#!/bin/bash
+
+set -e 
 
 static_folder=/home/non-root/opt/star_burger_drf_2/static
 
@@ -18,7 +21,6 @@ pip install -r requirements.txt
 sudo systemctl reload nginx.service
 
 sudo systemctl restart star_burger.service
-
 
 source /home/non-root/opt/star_burger_drf_2/.env
 
