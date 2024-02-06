@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e 
+set -e
 
 static_folder=/home/non-root/opt/star_burger_drf_2/static
 
@@ -49,5 +49,5 @@ curl -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" -H "Content-Type: applic
 
 echo ''
 
-echo "**deploy script done.**"
+echo "<<<<<<deploy script done.>>>>>>"
 
