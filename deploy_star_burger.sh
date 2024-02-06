@@ -27,13 +27,13 @@ sudo systemctl restart star_burger.service
 source /home/non-root/opt/star_burger_drf_2/.env
 
 commit_hash=$(git rev-parse --short HEAD)
-echo $commit_hash
+echo commit hash: $commit_hash
 
 commit_comment=$(git log --format=%B -n 1 $commit_hash)
-echo $commit_comment
+echo commit: $commit_comment
 
 commit_author=$(git log --format='%an' -n 1 $commit_hash)
-echo $commit_author
+echo author: $commit_author
 
 payload='{
   "environment": "production",
@@ -46,5 +46,8 @@ payload='{
 
 curl -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" -H "Content-Type: application/json" -X POST 'https://api.rollbar.com/api/1/deploy' -d "$payload"
 
-echo "deploy script done."
+
+echo ''
+
+echo "**deploy script done.**"
 
