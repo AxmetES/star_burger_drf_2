@@ -4,9 +4,13 @@ set -e
 
 static_folder=/home/non-root/opt/star_burger_drf_2/static
 
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
-
 source venv/bin/activate
+
+git pull
+
+pip install -r requirements.txt
+
+./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 
 if [ -d "$static_folder" ]; then
     echo "Static folder already exists"
@@ -15,8 +19,6 @@ else
 fi
 
 python3 manage.py migrate
-
-pip install -r requirements.txt
 
 sudo systemctl reload nginx.service
 
@@ -33,7 +35,6 @@ echo $commit_comment
 commit_author=$(git log --format='%an' -n 1 $commit_hash)
 echo $commit_author
 
-# Use double quotes for the JSON payload, and properly escape the inner double quotes
 payload='{
   "environment": "production",
   "revision": "'$commit_hash'",
