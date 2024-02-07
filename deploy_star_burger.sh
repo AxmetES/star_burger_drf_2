@@ -2,10 +2,11 @@
 
 set -e
 
-static_folder=/home/non-root/opt/star_burger_drf_2/static
+static_folder=/opt/star_burger_drf_2/static
 
 source venv/bin/activate
 
+echo "step git pull"
 git pull
 
 pip install -r requirements.txt
@@ -20,11 +21,11 @@ fi
 
 python3 manage.py migrate
 
-sudo systemctl reload nginx.service
+systemctl reload nginx.service
 
-sudo systemctl restart star_burger.service
+systemctl restart star_burger.service
 
-source /home/non-root/opt/star_burger_drf_2/.env
+source /opt/star_burger_drf_2/.env
 
 commit_hash=$(git rev-parse --short HEAD)
 echo commit hash: $commit_hash
