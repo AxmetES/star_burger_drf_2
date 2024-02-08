@@ -13,11 +13,7 @@ pip install -r requirements.txt
 
 ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 
-if [ -d "$static_folder" ]; then
-    echo "Static folder already exists"
-else
-    python3 manage.py collectstatic
-fi
+python manage.py collectstatic --noinput
 
 python3 manage.py migrate
 
